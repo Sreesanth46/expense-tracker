@@ -10,10 +10,39 @@ import { ExpenseTracking } from '@/components/expense-tracking';
 import { DebtVisualization } from '@/components/debt-visualization';
 import { BillProcessing } from '@/components/bill-processing';
 import { useExpense } from '@/contexts/expense-context';
+import TabView, { type TabViewProps } from '@/components/tab-view';
 
 export default function ExpenseTracker() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const { totalOwed, totalExpenses, pendingPayments, friends } = useExpense();
+
+  const tabs: TabViewProps['tabs'] = [
+    {
+      value: 'dashboard',
+      label: 'Dashboard',
+      component: <DashboardOverview />
+    },
+    {
+      value: 'friends',
+      label: 'Friends',
+      component: <FriendManagement />
+    },
+    {
+      value: 'expenses',
+      label: 'Expenses',
+      component: <ExpenseTracking />
+    },
+    {
+      value: 'debt',
+      label: 'Debt',
+      component: <DebtVisualization />
+    },
+    {
+      value: 'bills',
+      label: 'Bills',
+      component: <BillProcessing />
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,38 +126,7 @@ export default function ExpenseTracker() {
         </div>
 
         {/* Main Content */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="friends">Friends</TabsTrigger>
-            <TabsTrigger value="expenses">Expenses</TabsTrigger>
-            <TabsTrigger value="debts">Debts</TabsTrigger>
-            <TabsTrigger value="bills">Bills</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard">
-            <DashboardOverview />
-          </TabsContent>
-
-          <TabsContent value="friends">
-            <FriendManagement />
-          </TabsContent>
-
-          <TabsContent value="expenses">
-            <ExpenseTracking />
-          </TabsContent>
-
-          <TabsContent value="debts">
-            <DebtVisualization />
-          </TabsContent>
-
-          <TabsContent value="bills">
-            <BillProcessing />
-          </TabsContent>
-        </Tabs>
+        <TabView tabs={tabs} />
       </div>
     </div>
   );
