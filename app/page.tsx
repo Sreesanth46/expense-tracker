@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, TrendingUp, DollarSign } from 'lucide-react';
 import { DashboardOverview } from '@/components/dashboard-overview';
@@ -12,7 +11,6 @@ import { useExpense } from '@/contexts/expense-context';
 import TabView, { type TabViewProps } from '@/components/tab-view';
 
 export default function ExpenseTracker() {
-  const [activeTab, setActiveTab] = useState('dashboard');
   const { totalOwed, totalExpenses, pendingPayments, friends } = useExpense();
 
   const tabs: TabViewProps['tabs'] = [
