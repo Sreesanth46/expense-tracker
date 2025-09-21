@@ -1,31 +1,38 @@
-"use client"
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react"
-import type { Friend, Expense } from "@/app/page"
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { TrendingUp, TrendingDown, DollarSign, Calendar } from 'lucide-react';
+import { useExpense } from '@/contexts/expense-context';
 
-interface DebtVisualizationProps {
-  friends: Friend[]
-  expenses: Expense[]
-}
+export function DebtVisualization() {
+  const { friends, expenses } = useExpense();
 
-export function DebtVisualization({ friends, expenses }: DebtVisualizationProps) {
   const getFriendDebts = () => {
     return friends
-      .map((friend) => {
-        const friendExpenses = expenses.filter((e) => e.friendId === friend.id)
+      .map(friend => {
+        const friendExpenses = expenses.filter(e => e.friendId === friend.id);
         const totalOwed = friendExpenses
-          .filter((e) => e.status !== "paid")
-          .reduce((sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0), 0)
+          .filter(e => e.status !== 'paid')
+          .reduce(
+            (sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0),
+            0
+          );
         const totalPaid = friendExpenses
-          .filter((e) => e.status === "paid")
-          .reduce((sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0), 0)
-        const totalExpenses = friendExpenses.length
-        const pendingExpenses = friendExpenses.filter((e) => e.status === "pending").length
-        const emiExpenses = friendExpenses.filter((e) => e.isEMI && e.status !== "paid")
+          .filter(e => e.status === 'paid')
+          .reduce(
+            (sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0),
+            0
+          );
+        const totalExpenses = friendExpenses.length;
+        const pendingExpenses = friendExpenses.filter(
+          e => e.status === 'pending'
+        ).length;
+        const emiExpenses = friendExpenses.filter(
+          e => e.isEMI && e.status !== 'paid'
+        );
 
         return {
           ...friend,
@@ -35,35 +42,37 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
           pendingExpenses,
           emiExpenses,
           lastExpenseDate:
-            friendExpenses.length > 0 ? Math.max(...friendExpenses.map((e) => new Date(e.date).getTime())) : null,
-        }
+            friendExpenses.length > 0
+              ? Math.max(...friendExpenses.map(e => new Date(e.date).getTime()))
+              : null
+        };
       })
-      .sort((a, b) => b.totalOwed - a.totalOwed)
-  }
+      .sort((a, b) => b.totalOwed - a.totalOwed);
+  };
 
   const getOverallStats = () => {
     const totalOwed = expenses
-      .filter((e) => e.status !== "paid")
-      .reduce((sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0), 0)
+      .filter(e => e.status !== 'paid')
+      .reduce((sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0), 0);
     const totalPaid = expenses
-      .filter((e) => e.status === "paid")
-      .reduce((sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0), 0)
+      .filter(e => e.status === 'paid')
+      .reduce((sum, e) => sum + e.amount + (e.tax || 0) + (e.interest || 0), 0);
     const totalEMI = expenses
-      .filter((e) => e.isEMI && e.status !== "paid")
-      .reduce((sum, e) => sum + (e.emiDetails?.totalAmount || e.amount), 0)
-    const overdueExpenses = expenses.filter((e) => {
-      if (e.status !== "pending") return false
-      const expenseDate = new Date(e.date)
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      return expenseDate < thirtyDaysAgo
-    }).length
+      .filter(e => e.isEMI && e.status !== 'paid')
+      .reduce((sum, e) => sum + (e.emiDetails?.totalAmount || e.amount), 0);
+    const overdueExpenses = expenses.filter(e => {
+      if (e.status !== 'pending') return false;
+      const expenseDate = new Date(e.date);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      return expenseDate < thirtyDaysAgo;
+    }).length;
 
-    return { totalOwed, totalPaid, totalEMI, overdueExpenses }
-  }
+    return { totalOwed, totalPaid, totalEMI, overdueExpenses };
+  };
 
-  const friendDebts = getFriendDebts()
-  const stats = getOverallStats()
+  const friendDebts = getFriendDebts();
+  const stats = getOverallStats();
 
   return (
     <div className="space-y-6">
@@ -75,8 +84,12 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-red-600 dark:text-red-400 text-sm font-medium">Total Owed</p>
-                <p className="text-2xl font-bold text-red-900 dark:text-red-100">₹{stats.totalOwed.toLocaleString()}</p>
+                <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                  Total Owed
+                </p>
+                <p className="text-2xl font-bold text-red-900 dark:text-red-100">
+                  ₹{stats.totalOwed.toLocaleString()}
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
@@ -87,7 +100,9 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-600 dark:text-green-400 text-sm font-medium">Total Paid</p>
+                <p className="text-green-600 dark:text-green-400 text-sm font-medium">
+                  Total Paid
+                </p>
                 <p className="text-2xl font-bold text-green-900 dark:text-green-100">
                   ₹{stats.totalPaid.toLocaleString()}
                 </p>
@@ -101,7 +116,9 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">EMI Outstanding</p>
+                <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">
+                  EMI Outstanding
+                </p>
                 <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
                   ₹{stats.totalEMI.toLocaleString()}
                 </p>
@@ -115,8 +132,12 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-orange-600 dark:text-orange-400 text-sm font-medium">Overdue</p>
-                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">{stats.overdueExpenses}</p>
+                <p className="text-orange-600 dark:text-orange-400 text-sm font-medium">
+                  Overdue
+                </p>
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  {stats.overdueExpenses}
+                </p>
               </div>
               <Calendar className="h-8 w-8 text-orange-600 dark:text-orange-400" />
             </div>
@@ -128,11 +149,12 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Friend-wise Debt Breakdown</h3>
         {friendDebts.length > 0 ? (
-          friendDebts.map((friend) => {
+          friendDebts.map(friend => {
             const paymentRate =
               friend.totalPaid + friend.totalOwed > 0
-                ? (friend.totalPaid / (friend.totalPaid + friend.totalOwed)) * 100
-                : 0
+                ? (friend.totalPaid / (friend.totalPaid + friend.totalOwed)) *
+                  100
+                : 0;
 
             return (
               <Card key={friend.id}>
@@ -140,23 +162,31 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={friend.avatar || "/placeholder.svg"} />
+                        <AvatarImage
+                          src={friend.avatar || '/placeholder.svg'}
+                        />
                         <AvatarFallback>
                           {friend.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
+                            .split(' ')
+                            .map(n => n[0])
+                            .join('')
                             .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <h4 className="text-lg font-semibold">{friend.name}</h4>
-                        <p className="text-sm text-muted-foreground">{friend.totalExpenses} total expenses</p>
+                        <p className="text-sm text-muted-foreground">
+                          {friend.totalExpenses} total expenses
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-destructive">₹{friend.totalOwed.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground">outstanding</p>
+                      <p className="text-2xl font-bold text-destructive">
+                        ₹{friend.totalOwed.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        outstanding
+                      </p>
                     </div>
                   </div>
 
@@ -169,43 +199,55 @@ export function DebtVisualization({ friends, expenses }: DebtVisualizationProps)
                       <Progress value={paymentRate} className="h-2" />
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Total Paid</p>
-                      <p className="font-semibold text-green-600">₹{friend.totalPaid.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Total Paid
+                      </p>
+                      <p className="font-semibold text-green-600">
+                        ₹{friend.totalPaid.toLocaleString()}
+                      </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Pending Payments</p>
+                      <p className="text-sm text-muted-foreground">
+                        Pending Payments
+                      </p>
                       <p className="font-semibold">{friend.pendingExpenses}</p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     {friend.totalOwed > 0 && (
-                      <Badge variant="destructive">₹{friend.totalOwed.toLocaleString()} owed</Badge>
+                      <Badge variant="destructive">
+                        ₹{friend.totalOwed.toLocaleString()} owed
+                      </Badge>
                     )}
                     {friend.emiExpenses.length > 0 && (
-                      <Badge variant="secondary">{friend.emiExpenses.length} EMI active</Badge>
+                      <Badge variant="secondary">
+                        {friend.emiExpenses.length} EMI active
+                      </Badge>
                     )}
                     {friend.lastExpenseDate && (
                       <Badge variant="outline">
-                        Last expense: {new Date(friend.lastExpenseDate).toLocaleDateString()}
+                        Last expense:{' '}
+                        {new Date(friend.lastExpenseDate).toLocaleDateString()}
                       </Badge>
                     )}
                   </div>
                 </CardContent>
               </Card>
-            )
+            );
           })
         ) : (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-muted-foreground text-center">
-                No debt data available. Add some expenses to see debt visualization.
+                No debt data available. Add some expenses to see debt
+                visualization.
               </p>
             </CardContent>
           </Card>
         )}
       </div>
     </div>
-  )
+  );
 }
