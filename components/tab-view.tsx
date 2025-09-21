@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export interface TabViewProps {
   activeTab?: string;
@@ -10,18 +11,29 @@ export interface TabViewProps {
 }
 
 export default function TabView({
-  activeTab,
+  activeTab: _activeTab,
   tabs,
   tabKey = 'tab'
 }: TabViewProps) {
   const router = useRouter();
   const query = useSearchParams();
   const pathname = usePathname();
+  const [activeTab, setActiveTab] = useState<string>(
+    query.get(tabKey) ?? tabs[0].value
+  );
+
+  useEffect(() => {
+    const tab = query.get(tabKey);
+    if (!tab) {
+      onValueChange(tabs[0].value);
+    }
+  }, []);
 
   function onValueChange(value: string) {
     const searchParams = new URLSearchParams(query.toString());
     searchParams.set(tabKey, value);
     router.push(`${pathname}?${searchParams.toString()}`, { scroll: true });
+    setActiveTab(previous => (value !== previous ? value : previous));
   }
 
   return (
