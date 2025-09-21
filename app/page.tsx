@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, TrendingUp, DollarSign } from 'lucide-react';
 import { DashboardOverview } from '@/components/dashboard-overview';
 import { FriendManagement } from '@/components/friend-management';
