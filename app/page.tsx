@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, TrendingUp, DollarSign } from 'lucide-react';
@@ -9,79 +9,11 @@ import { FriendManagement } from '@/components/friend-management';
 import { ExpenseTracking } from '@/components/expense-tracking';
 import { DebtVisualization } from '@/components/debt-visualization';
 import { BillProcessing } from '@/components/bill-processing';
-
-export interface Friend {
-  id: string;
-  name: string;
-  email?: string;
-  totalOwed: number;
-  avatar?: string;
-}
-
-export interface Expense {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-  friendId: string;
-  creditCardId: string;
-  category: string;
-  isEMI: boolean;
-  emiDetails?: {
-    totalAmount: number;
-    monthlyAmount: number;
-    remainingMonths: number;
-    interestRate: number;
-  };
-  tax?: number;
-  interest?: number;
-  status: 'pending' | 'paid' | 'overdue';
-}
+import { useExpense } from '@/contexts/expense-context';
 
 export default function ExpenseTracker() {
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [creditCards, setCreditCards] = useState<any[]>([]);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [activeTab, setActiveTab] = useState('dashboard');
-
-  // Load data from localStorage on mount
-  useEffect(() => {
-    const savedFriends = localStorage.getItem('expense-tracker-friends');
-    const savedCards = localStorage.getItem('expense-tracker-cards');
-    const savedExpenses = localStorage.getItem('expense-tracker-expenses');
-
-    if (savedFriends) setFriends(JSON.parse(savedFriends));
-    if (savedCards) setCreditCards(JSON.parse(savedCards));
-    if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
-  }, []);
-
-  // Save data to localStorage whenever state changes
-  useEffect(() => {
-    localStorage.setItem('expense-tracker-friends', JSON.stringify(friends));
-  }, [friends]);
-
-  useEffect(() => {
-    localStorage.setItem('expense-tracker-cards', JSON.stringify(creditCards));
-  }, [creditCards]);
-
-  useEffect(() => {
-    localStorage.setItem('expense-tracker-expenses', JSON.stringify(expenses));
-  }, [expenses]);
-
-  const totalOwed = friends.reduce((sum, friend) => sum + friend.totalOwed, 0);
-  const totalExpenses = expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  );
-  const pendingPayments = expenses.filter(e => e.status === 'pending').length;
-
-  // const tabs = [
-  //   { value: 'dashboard', label: 'Dashboard', component: DashboardOverview },
-  //   { value: 'friends', label: 'Friends', component: FriendManagement },
-  //   { value: 'expenses', label: 'Expenses', component: ExpenseTracking },
-  //   { value: 'debts', label: 'Debts', component: DebtVisualization },
-  //   { value: 'bills', label: 'Bills', component: BillProcessing }
-  // ];
+  const { totalOwed, totalExpenses, pendingPayments, friends } = useExpense();
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,45 +110,23 @@ export default function ExpenseTracker() {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <DashboardOverview
-              friends={friends}
-              creditCards={creditCards}
-              expenses={expenses}
-              setCreditCards={setCreditCards}
-            />
+            <DashboardOverview />
           </TabsContent>
 
           <TabsContent value="friends">
-            <FriendManagement
-              friends={friends}
-              setFriends={setFriends}
-              expenses={expenses}
-            />
+            <FriendManagement />
           </TabsContent>
 
           <TabsContent value="expenses">
-            <ExpenseTracking
-              friends={friends}
-              creditCards={creditCards}
-              expenses={expenses}
-              setExpenses={setExpenses}
-              setFriends={setFriends}
-            />
+            <ExpenseTracking />
           </TabsContent>
 
           <TabsContent value="debts">
-            <DebtVisualization friends={friends} expenses={expenses} />
+            <DebtVisualization />
           </TabsContent>
 
           <TabsContent value="bills">
-            <BillProcessing
-              friends={friends}
-              creditCards={creditCards}
-              expenses={expenses}
-              setExpenses={setExpenses}
-              setFriends={setFriends}
-              setCreditCards={setCreditCards}
-            />
+            <BillProcessing />
           </TabsContent>
         </Tabs>
       </div>
