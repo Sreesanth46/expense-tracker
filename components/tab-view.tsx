@@ -1,10 +1,10 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export interface TabViewProps {
-  activeTab: string;
+  activeTab?: string;
   tabs: { value: string; label: string; component: React.ReactNode }[];
   tabKey?: string;
 }
@@ -15,17 +15,13 @@ export default function TabView({
   tabKey = 'tab'
 }: TabViewProps) {
   const router = useRouter();
-  const { query } = router;
+  const query = useSearchParams();
+  const pathname = usePathname();
 
   function onValueChange(value: string) {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...query, [tabKey]: value }
-      },
-      undefined,
-      { shallow: true } // avoids full reload
-    );
+    const searchParams = new URLSearchParams(query.toString());
+    searchParams.set(tabKey, value);
+    router.push(`${pathname}?${searchParams.toString()}`, { scroll: true });
   }
 
   return (
