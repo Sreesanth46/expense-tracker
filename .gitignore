@@ -130,6 +130,7 @@ dist
 .pnp.*
 
 db-data
+db_data
 
 mermerd
 
