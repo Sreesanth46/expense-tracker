@@ -1,20 +1,15 @@
-import { db } from './index';
+import env from '@/lib/env';
+import { connection, db } from './index';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import config from '@/drizzle.config';
 
-async function runMigration() {
-  const connectionString = process.env.DATABASE_URL!;
-
-  if (!connectionString) {
-    throw new Error('DATABASE_URL environment variable is required');
-  }
-
-  try {
-    await migrate(db, { migrationsFolder: './lib/db/migrations' });
-    console.log('Completed migrations');
-  } catch (error) {
-    console.error('Migration failed:', error);
-    process.exit(1);
-  }
+if (!env.DB_MIGRATING) {
+  throw new Error(
+    'You must set DB_MIGRATING to "true" when running migrations'
+  );
 }
 
-runMigration();
+(async () => {
+  await migrate(db, { migrationsFolder: config.out! });
+  await connection.end();
+})();
