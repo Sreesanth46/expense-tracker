@@ -17,7 +17,15 @@ const EnvSchema = z.object({
   DB_PORT: z.coerce.number(),
   DATABASE_URL: z.string(),
   DB_MIGRATING: stringBoolean,
-  DB_SEEDING: stringBoolean
+  DB_SEEDING: stringBoolean,
+  JWT_ACCESS_SECRET: z
+    .string()
+    .min(32, 'JWT_ACCESS_SECRET must be at least 32 characters long'),
+  JWT_REFRESH_SECRET: z
+    .string()
+    .min(32, 'JWT_REFRESH_SECRET must be at least 32 characters long'),
+  JWT_ACCESS_TOKEN_EXPIRY: z.string().optional().default('15m'),
+  JWT_REFRESH_TOKEN_EXPIRY: z.string().optional().default('1d')
 });
 
 export type EnvSchema = z.infer<typeof EnvSchema>;
