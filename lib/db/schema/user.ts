@@ -13,7 +13,7 @@ export const UserTable = pgTable(
     lastName: varchar('last_name', { length: 255 }).notNull(),
     email: varchar('email', { length: 255 }).unique().notNull(),
     phone: varchar('phone', { length: 20 }).unique(),
-    hashedPassword: varchar('hashed_password', { length: 255 }).notNull(),
+    password: varchar('password', { length: 255 }).notNull(),
     ...dateMixin
   },
   table => [uniqueIndex('emailIndex').on(table.email)]
