@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { createInsertSchema } from 'drizzle-zod';
 import { UserTable } from '@/lib/db/schema';
 import db from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 
 export default async function signup(
   request: NextApiRequest,
@@ -14,22 +14,22 @@ export default async function signup(
   }
 
   const userInsertSchema = createInsertSchema(UserTable);
-  const result = userInsertSchema.safeParse(request.body);
+  const parsedData = userInsertSchema.safeParse(request.body);
 
-  if (!result.success) {
+  if (!parsedData.success) {
     return response
       .status(400)
-      .json({ status: 'Error', errors: result.error.issues });
+      .json({ status: 'Error', errors: parsedData.error.issues });
   }
 
   try {
-    const { password, ...parsedData } = result.data;
+    const parsed = parsedData.data;
 
     // Check if the user already exists
     const existingUser = await db
       .select()
       .from(UserTable)
-      .where(eq(UserTable.email, parsedData.email));
+      .where(eq(UserTable.email, parsed.email));
 
     if (existingUser.length) {
       return response
@@ -38,22 +38,19 @@ export default async function signup(
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(parsed.password, 10);
 
     // Store the username and hashed password in the database
+    const { password, ...safeColumns } = getTableColumns(UserTable);
+
     const user = await db
       .insert(UserTable)
       .values({
-        ...parsedData,
+        ...parsed,
         password: hashedPassword
       })
       .returning({
-        id: UserTable.id,
-        email: UserTable.email,
-        createdAt: UserTable.createdAt,
-        firstName: UserTable.firstName,
-        lastName: UserTable.lastName,
-        phone: UserTable.phone
+        ...safeColumns
       });
 
     // If user is created successfully, return a success message
