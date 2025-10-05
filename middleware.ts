@@ -1,12 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { isAuthenticated } from './lib/auth';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)']);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+});
 
 export const config = {
-  matcher: '/api/:function*'
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)'
+  ]
 };
-
-export function middleware(request: NextRequest) {
-  if (!isAuthenticated(request)) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
-}
