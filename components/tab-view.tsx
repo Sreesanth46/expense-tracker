@@ -19,11 +19,11 @@ export default function TabView({
   const query = useSearchParams();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<string>(
-    query.get(tabKey) ?? tabs[0].value
+    query?.get(tabKey) ?? tabs[0].value
   );
 
   useEffect(() => {
-    const tab = query.get(tabKey);
+    const tab = query?.get(tabKey);
     if (!tab) {
       onValueChange(tabs[0].value);
     }
@@ -32,7 +32,7 @@ export default function TabView({
   function onValueChange(value: string) {
     const searchParams = new URLSearchParams(query.toString());
     searchParams.set(tabKey, value);
-    router.push(`${pathname}?${searchParams.toString()}`, { scroll: true });
+    router.push(`${pathname}?${searchParams.toString()}`, { scroll: false });
     setActiveTab(previous => (value !== previous ? value : previous));
   }
 
