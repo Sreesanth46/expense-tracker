@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -23,30 +23,42 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { PlusCircle, CreditCard, Calendar, Trash2 } from 'lucide-react';
 import { useExpense } from '@/contexts/expense-context';
+import { NewCreditCard as TNewCreditCard } from '@/lib/db/schema/card';
+
+type NewCreditCard = Omit<TNewCreditCard, 'dueDate' | 'billingDate'> & {
+  dueDate?: string;
+  billingDate?: string;
+};
 
 export function DashboardOverview() {
-  const { friends, creditCards, expenses, addCreditCard, deleteCreditCard } =
-    useExpense();
+  const {
+    friends,
+    creditCards,
+    expenses,
+    addCreditCard,
+    deleteCreditCard,
+    fetchCreditCards
+  } = useExpense();
 
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
-  const [newCard, setNewCard] = useState({
+  const [newCard, setNewCard] = useState<NewCreditCard>({
     name: '',
     lastFourDigits: '',
     bank: '',
-    currentBalance: 0,
+    creditLimit: 0,
     dueDate: ''
   });
 
   const handleAddCard = () => {
     if (!newCard.name || !newCard.lastFourDigits || !newCard.bank) return;
 
-    addCreditCard(newCard);
+    addCreditCard(newCard as TNewCreditCard);
 
     setNewCard({
       name: '',
       lastFourDigits: '',
       bank: '',
-      currentBalance: 0,
+      creditLimit: 0,
       dueDate: ''
     });
     setIsAddCardOpen(false);
@@ -59,6 +71,10 @@ export function DashboardOverview() {
   const recentExpenses = expenses
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
+
+  useEffect(() => {
+    fetchCreditCards();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -116,15 +132,15 @@ export function DashboardOverview() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="balance">Current Balance</Label>
+                  <Label htmlFor="balance">Credit Limit</Label>
                   <Input
                     id="balance"
                     type="number"
-                    value={newCard.currentBalance}
+                    value={newCard.creditLimit}
                     onChange={e =>
                       setNewCard({
                         ...newCard,
-                        currentBalance: Number.parseFloat(e.target.value) || 0
+                        creditLimit: Number.parseFloat(e.target.value) || 0
                       })
                     }
                     placeholder="0"
@@ -174,7 +190,7 @@ export function DashboardOverview() {
                       Balance:
                     </span>
                     <span className="font-medium">
-                      ₹{card.currentBalance.toLocaleString()}
+                      ₹{card.creditLimit.toLocaleString()}
                     </span>
                   </div>
                   {card.dueDate && (
