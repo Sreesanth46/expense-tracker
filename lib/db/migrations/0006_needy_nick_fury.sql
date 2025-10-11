@@ -1,0 +1,1 @@
+ALTER TABLE "credit_card" ADD COLUMN "used_limit" real DEFAULT 0 NOT NULL;

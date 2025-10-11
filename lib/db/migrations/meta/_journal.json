@@ -43,6 +43,13 @@
       "when": 1760196876558,
       "tag": "0005_goofy_spyke",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1760205379542,
+      "tag": "0006_needy_nick_fury",
+      "breakpoints": true
     }
   ]
 }

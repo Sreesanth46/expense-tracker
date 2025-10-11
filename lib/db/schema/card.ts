@@ -9,6 +9,7 @@ export const CreditCardTable = pgTable('credit_card', {
   lastFourDigits: varchar('last_four_digits', { length: 4 }).notNull(),
   bank: varchar('bank', { length: 255 }).notNull(),
   creditLimit: real('credit_limit').notNull().default(0),
+  usedLimit: real('used_limit').notNull().default(0),
   dueDate: timestamp('due_date'),
   billingDate: timestamp('billing_date'),
   userId: uuid().references(() => UserTable.id, { onDelete: 'cascade' }),
