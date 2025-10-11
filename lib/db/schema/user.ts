@@ -9,11 +9,12 @@ export const UserTable = pgTable(
   'user',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    clerkId: varchar('clerk_id', { length: 255 }).unique(),
     firstName: varchar('first_name', { length: 255 }).notNull(),
     lastName: varchar('last_name', { length: 255 }).notNull(),
     email: varchar('email', { length: 255 }).unique().notNull(),
     phone: varchar('phone', { length: 20 }).unique(),
-    password: varchar('password', { length: 255 }).notNull(),
+    profileImage: varchar('profile_image', { length: 512 }),
     ...dateMixin
   },
   table => [uniqueIndex('emailIndex').on(table.email)]
