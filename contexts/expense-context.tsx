@@ -16,6 +16,7 @@ interface ExpenseContextType {
   friends: Friend[];
   creditCards: CreditCard[];
   expenses: Expense[];
+  isCardDeleting: boolean;
 
   // Actions
   addFriend: (friend: Omit<Friend, 'id' | 'totalOwed'>) => void;
@@ -44,6 +45,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [isCardDeleting, setIsCardDeleting] = useState(false);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -133,10 +135,11 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const deleteCreditCard = (id: string) => {
-    setCreditCards(prev => prev.filter(card => card.id !== id));
-    // Also remove expenses for this card
-    setExpenses(prev => prev.filter(expense => expense.creditCardId !== id));
+  const deleteCreditCard = async (id: string) => {
+    setIsCardDeleting(true);
+    await fetch(`/api/credit-card/${id}`, { method: 'DELETE' });
+    fetchCreditCards();
+    setIsCardDeleting(false);
   };
 
   // Expense actions
@@ -188,6 +191,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     friends,
     creditCards,
     expenses,
+    setIsCardDeleting,
 
     // Actions
     addFriend,
