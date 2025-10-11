@@ -21,7 +21,13 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle, CreditCard, Calendar, Trash2 } from 'lucide-react';
+import {
+  PlusCircle,
+  CreditCard,
+  Calendar,
+  Trash2,
+  LoaderCircle
+} from 'lucide-react';
 import { useExpense } from '@/contexts/expense-context';
 import { NewCreditCard as TNewCreditCard } from '@/lib/db/schema/card';
 
@@ -37,6 +43,7 @@ export function DashboardOverview() {
     expenses,
     addCreditCard,
     deleteCreditCard,
+    isCardDeleting,
     fetchCreditCards
   } = useExpense();
 
@@ -176,7 +183,11 @@ export function DashboardOverview() {
                     size="sm"
                     onClick={() => handleDeleteCard(card.id)}
                     className="text-destructive hover:text-destructive">
-                    <Trash2 className="h-4 w-4" />
+                    {isCardDeleting ? (
+                      <LoaderCircle />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
                 <CardDescription>
@@ -187,10 +198,18 @@ export function DashboardOverview() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">
-                      Balance:
+                      Credit Limit:
                     </span>
                     <span className="font-medium">
                       ₹{card.creditLimit.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Used Limit:
+                    </span>
+                    <span className="font-medium">
+                      ₹{card.usedLimit.toLocaleString()}
                     </span>
                   </div>
                   {card.dueDate && (
