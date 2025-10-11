@@ -24,13 +24,13 @@ export default function TabView({
 
   useEffect(() => {
     const tab = query?.get(tabKey);
-    if (!tab) {
-      onValueChange(tabs[0].value);
+    if (tab) {
+      onValueChange(tab);
     }
   }, []);
 
   function onValueChange(value: string) {
-    const searchParams = new URLSearchParams(query.toString());
+    const searchParams = new URLSearchParams(query?.toString() ?? '');
     searchParams.set(tabKey, value);
     router.push(`${pathname}?${searchParams.toString()}`, { scroll: false });
     setActiveTab(previous => (value !== previous ? value : previous));
