@@ -1,14 +1,15 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Users, TrendingUp, DollarSign } from 'lucide-react';
-import { DashboardOverview } from '@/components/dashboard-overview';
-import { FriendManagement } from '@/components/friend-management';
-import { ExpenseTracking } from '@/components/expense-tracking';
-import { DebtVisualization } from '@/components/debt-visualization';
 import { BillProcessing } from '@/components/bill-processing';
-import { useExpense } from '@/contexts/expense-context';
+import { DashboardOverview } from '@/components/dashboard-overview';
+import { DebtVisualization } from '@/components/debt-visualization';
+import { ExpenseTracking } from '@/components/expense-tracking';
+import { FriendManagement } from '@/components/friend-management';
 import TabView, { type TabViewProps } from '@/components/tab-view';
+import { Card, CardContent } from '@/components/ui/card';
+import { useExpense } from '@/contexts/expense-context';
+import { UserButton } from '@clerk/nextjs';
+import { DollarSign, TrendingUp, Users } from 'lucide-react';
 
 export default function ExpenseTracker() {
   const { totalOwed, totalExpenses, pendingPayments, friends } = useExpense();
@@ -53,6 +54,7 @@ export default function ExpenseTracker() {
             Track expenses, manage lending, and monitor what your friends owe
             you
           </p>
+          <UserButton />
         </div>
 
         {/* Quick Stats */}
