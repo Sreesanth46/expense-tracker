@@ -111,22 +111,22 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
   };
 
   // Credit Card actions
+  const fetchCreditCards = async () => {
+    const response = await fetch('/api/credit-card');
+    const cards = await response.json();
+    setCreditCards(cards);
+  };
+
   const addCreditCard = async (cardData: NewCreditCard) => {
-    const response = await fetch('/api/credit-card', {
+    await fetch('/api/credit-card', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(cardData)
     });
-    const newCard = await response.json();
-    setCreditCards(prev => [...prev, newCard]);
-  };
 
-  const fetchCreditCards = async () => {
-    const response = await fetch('/api/credit-card');
-    const cards = await response.json();
-    setCreditCards(cards);
+    fetchCreditCards();
   };
 
   const updateCreditCard = (id: string, updates: Partial<CreditCard>) => {
@@ -191,7 +191,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     friends,
     creditCards,
     expenses,
-    setIsCardDeleting,
+    isCardDeleting,
 
     // Actions
     addFriend,
