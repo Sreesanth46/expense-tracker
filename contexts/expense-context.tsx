@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard } from '@/types/card';
+import { CreditCard, NewCreditCard } from '@/lib/db/schema/card';
 import { Expense } from '@/types/expense';
 import { Friend } from '@/types/friend';
 import {
@@ -22,9 +22,10 @@ interface ExpenseContextType {
   updateFriend: (id: string, updates: Partial<Friend>) => void;
   deleteFriend: (id: string) => void;
 
-  addCreditCard: (card: Omit<CreditCard, 'id'>) => void;
+  addCreditCard: (card: NewCreditCard) => void;
   updateCreditCard: (id: string, updates: Partial<CreditCard>) => void;
   deleteCreditCard: (id: string) => void;
+  fetchCreditCards: () => void;
 
   addExpense: (expense: Omit<Expense, 'id' | 'date' | 'status'>) => void;
   updateExpense: (id: string, updates: Partial<Expense>) => void;
@@ -108,12 +109,22 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
   };
 
   // Credit Card actions
-  const addCreditCard = (cardData: Omit<CreditCard, 'id'>) => {
-    const newCard: CreditCard = {
-      id: Date.now().toString(),
-      ...cardData
-    };
+  const addCreditCard = async (cardData: NewCreditCard) => {
+    const response = await fetch('/api/credit-card', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cardData)
+    });
+    const newCard = await response.json();
     setCreditCards(prev => [...prev, newCard]);
+  };
+
+  const fetchCreditCards = async () => {
+    const response = await fetch('/api/credit-card');
+    const cards = await response.json();
+    setCreditCards(cards);
   };
 
   const updateCreditCard = (id: string, updates: Partial<CreditCard>) => {
@@ -183,6 +194,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     updateFriend,
     deleteFriend,
     addCreditCard,
+    fetchCreditCards,
     updateCreditCard,
     deleteCreditCard,
     addExpense,
