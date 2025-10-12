@@ -1,0 +1,1 @@
+ALTER TABLE "credit_card" ALTER COLUMN "userId" SET NOT NULL;
