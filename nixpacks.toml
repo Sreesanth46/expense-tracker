@@ -1,0 +1,21 @@
+[phases.setup]
+# Install pnpm and Node.js
+nixPkgs = ["nodejs", "pnpm"]
+
+[phases.build]
+# The build command for Next.js
+cmds = [
+  "pnpm install --frozen-lockfile",
+  "pnpm run build"
+]
+
+[phases.migrate]
+# generate and migrate schema changes
+cmd = [
+    "pnpm run db:generate",
+    "pnpm run db:migrate"
+]
+
+[start]
+# The command to start your Next.js app
+cmd = "pnpm run start"
