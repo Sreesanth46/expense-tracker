@@ -29,12 +29,7 @@ import {
   LoaderCircle
 } from 'lucide-react';
 import { useExpense } from '@/contexts/expense-context';
-import { NewCreditCard as TNewCreditCard } from '@/lib/db/schema/card';
-
-type NewCreditCard = Omit<TNewCreditCard, 'dueDate' | 'billingDate'> & {
-  dueDate?: string;
-  billingDate?: string;
-};
+import { CreditCardSchema } from '@/lib/db/schema/card';
 
 export function DashboardOverview() {
   const {
@@ -48,7 +43,7 @@ export function DashboardOverview() {
   } = useExpense();
 
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
-  const [newCard, setNewCard] = useState<NewCreditCard>({
+  const [newCard, setNewCard] = useState<CreditCardSchema>({
     name: '',
     lastFourDigits: '',
     bank: '',
@@ -59,7 +54,7 @@ export function DashboardOverview() {
   const handleAddCard = () => {
     if (!newCard.name || !newCard.lastFourDigits || !newCard.bank) return;
 
-    addCreditCard(newCard as TNewCreditCard);
+    addCreditCard(newCard);
 
     setNewCard({
       name: '',
@@ -158,7 +153,7 @@ export function DashboardOverview() {
                   <Input
                     id="dueDate"
                     type="date"
-                    value={newCard.dueDate}
+                    value={newCard.dueDate ?? undefined}
                     onChange={e =>
                       setNewCard({ ...newCard, dueDate: e.target.value })
                     }
