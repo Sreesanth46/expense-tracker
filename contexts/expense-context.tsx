@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard, NewCreditCard } from '@/lib/db/schema/card';
+import { CreditCard, CreditCardSchema } from '@/lib/db/schema/card';
 import { Expense } from '@/types/expense';
 import { Friend } from '@/types/friend';
 import {
@@ -23,7 +23,7 @@ interface ExpenseContextType {
   updateFriend: (id: string, updates: Partial<Friend>) => void;
   deleteFriend: (id: string) => void;
 
-  addCreditCard: (card: NewCreditCard) => void;
+  addCreditCard: (card: CreditCardSchema) => void;
   updateCreditCard: (id: string, updates: Partial<CreditCard>) => void;
   deleteCreditCard: (id: string) => void;
   fetchCreditCards: () => void;
@@ -117,7 +117,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
     setCreditCards(cards);
   };
 
-  const addCreditCard = async (cardData: NewCreditCard) => {
+  const addCreditCard = async (cardData: CreditCardSchema) => {
     await fetch('/api/credit-card', {
       method: 'POST',
       headers: {
