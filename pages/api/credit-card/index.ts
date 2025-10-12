@@ -1,20 +1,15 @@
 import db from '@/lib/db';
-import { CreditCardTable } from '@/lib/db/schema';
-import { createSchemaFactory } from 'drizzle-zod';
+import { CreditCardTable, UserTable } from '@/lib/db/schema';
+import { creditCardSchema } from '@/lib/db/schema/card';
+import { getAuth } from '@clerk/nextjs/server';
+import { eq } from 'drizzle-orm';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const handlePost = async (
   request: NextApiRequest,
   response: NextApiResponse
 ) => {
-  const { createInsertSchema } = createSchemaFactory({
-    coerce: {
-      date: true
-    }
-  });
-
-  const creditCardInsertSchema = createInsertSchema(CreditCardTable);
-  const parsedData = creditCardInsertSchema.safeParse(request.body);
+  const parsedData = creditCardSchema.safeParse(request.body);
 
   if (!parsedData.success) {
     return response
@@ -23,13 +18,25 @@ const handlePost = async (
   }
 
   try {
-    const { dueDate, ...parsed } = parsedData.data;
+    const parsed = parsedData.data;
+    const clerkId = getAuth(request).userId!;
+
+    const [existingUser] = await db
+      .select()
+      .from(UserTable)
+      .where(eq(UserTable.clerkId, clerkId));
+
+    if (!existingUser) {
+      return response
+        .status(404)
+        .json({ status: 'Error', message: 'User not found' });
+    }
 
     const creditCard = await db
       .insert(CreditCardTable)
       .values({
         ...parsed,
-        dueDate: dueDate ? new Date(dueDate) : null
+        userId: existingUser.id
       })
       .returning();
 
