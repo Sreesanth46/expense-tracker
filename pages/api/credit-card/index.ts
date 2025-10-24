@@ -1,7 +1,7 @@
 import db from '@/lib/db';
 import { CreditCardTable, UserTable } from '@/lib/db/schema';
 import { creditCardSchema } from '@/lib/db/schema/card';
-import { getAuth, clerkClient } from '@clerk/nextjs/server';
+import { getAuth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -21,28 +21,15 @@ const handlePost = async (
     const parsed = parsedData.data;
     const clerkId = getAuth(request).userId!;
 
-    let existingUser;
-    const [user] = await db
+    const [existingUser] = await db
       .select()
       .from(UserTable)
       .where(eq(UserTable.clerkId, clerkId));
 
-    if (!user) {
-      const client = await clerkClient();
-      const clerkUser = await client.users.getUser(clerkId);
-      const inserted = await db
-        .insert(UserTable)
-        .values({
-          clerkId,
-          firstName: clerkUser.firstName || '',
-          lastName: clerkUser.lastName || '',
-          email: clerkUser.primaryEmailAddress?.emailAddress || '',
-          profileImage: clerkUser.imageUrl
-        })
-        .returning();
-      existingUser = inserted[0];
-    } else {
-      existingUser = user;
+    if (!existingUser) {
+      return response
+        .status(400)
+        .json({ status: 'Error', message: 'User not found in database. User must be registered first.' });
     }
 
     const creditCard = await db
