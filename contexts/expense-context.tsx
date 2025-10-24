@@ -10,6 +10,7 @@ import {
   useEffect,
   type ReactNode
 } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface ExpenseContextType {
   // State
@@ -42,6 +43,7 @@ interface ExpenseContextType {
 const ExpenseContext = createContext<ExpenseContextType | undefined>(undefined);
 
 export function ExpenseProvider({ children }: { children: ReactNode }) {
+  const { toast } = useToast();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -112,21 +114,54 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
   // Credit Card actions
   const fetchCreditCards = async () => {
-    const response = await fetch('/api/credit-card');
-    const cards = await response.json();
-    setCreditCards(cards);
+    try {
+      const response = await fetch('/api/credit-card');
+      if (response.ok) {
+        const cards = await response.json();
+        setCreditCards(Array.isArray(cards) ? cards : []);
+      } else {
+        console.error('Failed to fetch credit cards:', response.statusText);
+        setCreditCards([]);
+      }
+    } catch (error) {
+      console.error('Error fetching credit cards:', error);
+      setCreditCards([]);
+    }
   };
 
   const addCreditCard = async (cardData: CreditCardSchema) => {
-    await fetch('/api/credit-card', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(cardData)
-    });
+    try {
+      const response = await fetch('/api/credit-card', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cardData)
+      });
 
-    fetchCreditCards();
+      if (response.ok) {
+        toast({
+          title: 'Success',
+          description: 'Credit card added successfully',
+          variant: 'success',
+        });
+        fetchCreditCards();
+      } else {
+        console.error('Failed to add credit card:', response.statusText);
+        toast({
+          title: 'Error',
+          description: 'Failed to add credit card. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error adding credit card:', error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while adding the credit card.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const updateCreditCard = (id: string, updates: Partial<CreditCard>) => {
@@ -137,8 +172,31 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
   const deleteCreditCard = async (id: string) => {
     setIsCardDeleting(true);
-    await fetch(`/api/credit-card/${id}`, { method: 'DELETE' });
-    fetchCreditCards();
+    try {
+      const response = await fetch(`/api/credit-card/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        toast({
+          title: 'Success',
+          description: 'Credit card deleted successfully',
+          variant: 'success',
+        });
+        fetchCreditCards();
+      } else {
+        console.error('Failed to delete credit card:', response.statusText);
+        toast({
+          title: 'Error',
+          description: 'Failed to delete credit card. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting credit card:', error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while deleting the credit card.',
+        variant: 'destructive',
+      });
+    }
     setIsCardDeleting(false);
   };
 

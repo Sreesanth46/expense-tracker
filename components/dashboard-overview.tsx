@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -18,18 +18,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   PlusCircle,
   CreditCard,
   Calendar,
   Trash2,
-  LoaderCircle
-} from 'lucide-react';
-import { useExpense } from '@/contexts/expense-context';
-import { CreditCardSchema } from '@/lib/db/schema/card';
+  LoaderCircle,
+} from "lucide-react";
+import { useExpense } from "@/contexts/expense-context";
+import { CreditCardSchema } from "@/lib/db/schema/card";
 
 export function DashboardOverview() {
   const {
@@ -39,16 +39,16 @@ export function DashboardOverview() {
     addCreditCard,
     deleteCreditCard,
     isCardDeleting,
-    fetchCreditCards
+    fetchCreditCards,
   } = useExpense();
 
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
   const [newCard, setNewCard] = useState<CreditCardSchema>({
-    name: '',
-    lastFourDigits: '',
-    bank: '',
+    name: "",
+    lastFourDigits: "",
+    bank: "",
     creditLimit: 0,
-    dueDate: ''
+    dueDate: "",
   });
 
   const handleAddCard = () => {
@@ -57,11 +57,11 @@ export function DashboardOverview() {
     addCreditCard(newCard);
 
     setNewCard({
-      name: '',
-      lastFourDigits: '',
-      bank: '',
+      name: "",
+      lastFourDigits: "",
+      bank: "",
       creditLimit: 0,
-      dueDate: ''
+      dueDate: "",
     });
     setIsAddCardOpen(false);
   };
@@ -104,7 +104,7 @@ export function DashboardOverview() {
                   <Input
                     id="cardName"
                     value={newCard.name}
-                    onChange={e =>
+                    onChange={(e) =>
                       setNewCard({ ...newCard, name: e.target.value })
                     }
                     placeholder="e.g., HDFC Regalia"
@@ -115,7 +115,7 @@ export function DashboardOverview() {
                   <Input
                     id="bank"
                     value={newCard.bank}
-                    onChange={e =>
+                    onChange={(e) =>
                       setNewCard({ ...newCard, bank: e.target.value })
                     }
                     placeholder="e.g., HDFC Bank"
@@ -126,7 +126,7 @@ export function DashboardOverview() {
                   <Input
                     id="lastFour"
                     value={newCard.lastFourDigits}
-                    onChange={e =>
+                    onChange={(e) =>
                       setNewCard({ ...newCard, lastFourDigits: e.target.value })
                     }
                     placeholder="1234"
@@ -138,14 +138,14 @@ export function DashboardOverview() {
                   <Input
                     id="balance"
                     type="number"
-                    value={newCard.creditLimit}
-                    onChange={e =>
+                    value={newCard.creditLimit || ""}
+                    onChange={(e) =>
                       setNewCard({
                         ...newCard,
-                        creditLimit: Number.parseFloat(e.target.value) || 0
+                        creditLimit: Number.parseFloat(e.target.value) || 0,
                       })
                     }
-                    placeholder="0"
+                    placeholder="Enter Credit Limit"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -154,7 +154,7 @@ export function DashboardOverview() {
                     id="dueDate"
                     type="date"
                     value={newCard.dueDate ?? undefined}
-                    onChange={e =>
+                    onChange={(e) =>
                       setNewCard({ ...newCard, dueDate: e.target.value })
                     }
                   />
@@ -168,7 +168,7 @@ export function DashboardOverview() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {creditCards.map(card => (
+          {creditCards.map((card) => (
             <Card key={card.id} className="relative">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -177,7 +177,8 @@ export function DashboardOverview() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDeleteCard(card.id)}
-                    className="text-destructive hover:text-destructive">
+                    className="text-destructive hover:text-destructive"
+                  >
                     {isCardDeleting ? (
                       <LoaderCircle />
                     ) : (
@@ -246,20 +247,21 @@ export function DashboardOverview() {
           <CardContent>
             {recentExpenses.length > 0 ? (
               <div className="space-y-4">
-                {recentExpenses.map(expense => {
-                  const friend = friends.find(f => f.id === expense.friendId);
+                {recentExpenses.map((expense) => {
+                  const friend = friends.find((f) => f.id === expense.friendId);
                   const card = creditCards.find(
-                    c => c.id === expense.creditCardId
+                    (c) => c.id === expense.creditCardId
                   );
 
                   return (
                     <div
                       key={expense.id}
-                      className="flex items-center justify-between p-3 border rounded-lg">
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div className="flex-1">
                         <p className="font-medium">{expense.description}</p>
                         <p className="text-sm text-muted-foreground">
-                          {friend?.name} • {card?.name} •{' '}
+                          {friend?.name} • {card?.name} •{" "}
                           {new Date(expense.date).toLocaleDateString()}
                         </p>
                       </div>
@@ -269,12 +271,13 @@ export function DashboardOverview() {
                         </p>
                         <Badge
                           variant={
-                            expense.status === 'paid'
-                              ? 'default'
-                              : expense.status === 'pending'
-                              ? 'secondary'
-                              : 'destructive'
-                          }>
+                            expense.status === "paid"
+                              ? "default"
+                              : expense.status === "pending"
+                              ? "secondary"
+                              : "destructive"
+                          }
+                        >
                           {expense.status}
                         </Badge>
                       </div>
