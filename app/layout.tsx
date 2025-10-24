@@ -6,6 +6,7 @@ import './globals.css';
 import { Suspense } from 'react';
 import { ExpenseProvider } from '@/contexts/expense-context';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Budget Buddy',
@@ -25,6 +26,7 @@ export default function RootLayout({
           <Suspense fallback={<div>Loading...</div>}>
             <ExpenseProvider>{children}</ExpenseProvider>
           </Suspense>
+          <Toaster />
           <Analytics />
         </body>
       </html>

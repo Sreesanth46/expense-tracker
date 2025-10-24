@@ -21,7 +21,6 @@ export async function clerkWebhook(
     await db
       .insert(UserTable)
       .values({
-        id,
         clerkId: id,
         email,
         firstName: first_name,
@@ -29,11 +28,11 @@ export async function clerkWebhook(
         profileImage: image_url
       })
       .onConflictDoUpdate({
-        target: UserTable.id,
+        target: UserTable.clerkId,
         set: {
-          clerkId: id,
           email,
           firstName: first_name,
+          lastName: last_name,
           profileImage: image_url
         }
       });

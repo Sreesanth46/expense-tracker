@@ -28,8 +28,8 @@ const handlePost = async (
 
     if (!existingUser) {
       return response
-        .status(404)
-        .json({ status: 'Error', message: 'User not found' });
+        .status(400)
+        .json({ status: 'Error', message: 'User not found in database. User must be registered first.' });
     }
 
     const creditCard = await db
@@ -43,9 +43,10 @@ const handlePost = async (
     // If credit card is created successfully, return a success message
     response.status(201).json({ status: 'Created', creditCard });
   } catch (error) {
+    console.error('Error creating credit card:', error);
     response
       .status(500)
-      .json({ status: 'Error', message: 'Internal Server Error', error });
+      .json({ status: 'Error', message: 'Internal Server Error', details: error instanceof Error ? error.message : 'Unknown error' });
   }
 };
 
