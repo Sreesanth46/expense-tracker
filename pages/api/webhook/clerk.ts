@@ -2,11 +2,15 @@ import { db } from '@/lib/db';
 import { UserTable } from '@/lib/db/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export async function clerkWebhook(
+export default async function clerkWebhook(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
   try {
+    if (request.method !== 'POST') {
+      return response.status(405).json({ status: 'Method Not Allowed' });
+    }
+
     const {
       id,
       email_addresses,
@@ -16,6 +20,13 @@ export async function clerkWebhook(
     } = request.body?.data;
 
     const email = email_addresses[0]?.email_address;
+
+    if (!email) {
+      return response
+        .status(400)
+        .json({ message: 'Email address is required' });
+    }
+
     console.log('✅', request.body, image_url);
 
     await db
