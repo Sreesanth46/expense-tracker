@@ -25,7 +25,12 @@ const EnvSchema = z.object({
     .string()
     .min(32, 'JWT_REFRESH_SECRET must be at least 32 characters long'),
   JWT_ACCESS_TOKEN_EXPIRY: z.string().optional().default('15m'),
-  JWT_REFRESH_TOKEN_EXPIRY: z.string().optional().default('1d')
+  JWT_REFRESH_TOKEN_EXPIRY: z.string().optional().default('1d'),
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string(),
+  NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: z.string(),
+  NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: z.string(),
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
+  CLERK_SECRET_KEY: z.string()
 });
 
 export type EnvSchema = z.infer<typeof EnvSchema>;
